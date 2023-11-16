@@ -7,6 +7,7 @@ const ProductosItems = () => {
     const [prods, setProds] = useState([])
     const [product,setProduct]=useState([])
     const nav=useNavigate()
+    // https://qrsystemback.onrender.com/products
     useEffect(() => {
         fetch('https://qrsystemback.onrender.com/products')
             .then(response => response.json())
