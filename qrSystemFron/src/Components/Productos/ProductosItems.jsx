@@ -7,8 +7,8 @@ const ProductosItems = () => {
     const [prods, setProds] = useState([])
     const [product,setProduct]=useState([])
     const nav=useNavigate()
-    // https://qrsystemback.onrender.com/products
     useEffect(() => {
+        // https://qrsystemback.onrender.com/products
         fetch('https://qrsystemback.onrender.com/products')
             .then(response => response.json())
             .then(data => {
@@ -33,6 +33,7 @@ const ProductosItems = () => {
     }, []);
     
     const getQR = (productid) => {
+        //https://qrsystemback.onrender.com/products/${productid}
         // Retorna la promesa fetch para que pueda ser utilizada en Promise.all
         return fetch(`https://qrsystemback.onrender.com/products/${productid}`)
             .then(response => response.json())
