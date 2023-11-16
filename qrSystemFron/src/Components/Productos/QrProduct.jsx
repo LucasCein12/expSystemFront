@@ -8,7 +8,7 @@ const QrProduct = () => {
     const { detailProd } = location.state;
     console.log(detailProd.productid)
     useEffect(() => {
-        fetch(`http://localhost:3000/products/${detailProd.productid}`)
+        fetch(`https://qrsystemback.onrender.com/products/${detailProd.productid}`)
             .then(response => response.json())
             .then(data => {
                 setProduct(data)

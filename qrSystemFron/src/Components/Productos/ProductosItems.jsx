@@ -8,7 +8,7 @@ const ProductosItems = () => {
     const [product,setProduct]=useState([])
     const nav=useNavigate()
     useEffect(() => {
-        fetch('http://localhost:3000/products')
+        fetch('https://qrsystemback.onrender.com/products')
             .then(response => response.json())
             .then(data => {
                 // Inicializa un arreglo para mantener las promesas
@@ -33,7 +33,7 @@ const ProductosItems = () => {
     
     const getQR = (productid) => {
         // Retorna la promesa fetch para que pueda ser utilizada en Promise.all
-        return fetch(`http://localhost:3000/products/${productid}`)
+        return fetch(`https://qrsystemback.onrender.com/products/${productid}`)
             .then(response => response.json())
             .then(data => {
                 // Suponiendo que la respuesta incluye un campo qrCode
