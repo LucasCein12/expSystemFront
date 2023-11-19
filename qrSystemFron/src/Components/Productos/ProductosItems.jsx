@@ -1,48 +1,53 @@
 import { MDBListGroupItem } from "mdb-react-ui-kit"
 import { useEffect, useState } from "react";
-import { BsEyeFill } from "react-icons/bs";
+import { BsEyeFill, BsTrash3Fill } from "react-icons/bs";
 import { NavLink, useNavigate } from "react-router-dom";
-
-const ProductosItems = () => {
+import Popup from "reactjs-popup";
+import { BsPrinterFill } from "react-icons/bs";
+import { BsPencilFill } from "react-icons/bs";
+import ABMProductos from "./ABMProductos";
+const ProductosItems = ({ productos }) => {
     const [prods, setProds] = useState([])
-    const [product,setProduct]=useState([])
-    const nav=useNavigate()
+
+
     useEffect(() => {
-        // https://qrsystemback.onrender.com/products
+        if (productos) {
+            setProds(productos)
+        }
+    }, [productos]);
+    const actualizarListaProductos = () => {
+        // Aquí se hace la llamada a la API para obtener la lista actualizada de productos
         fetch('https://qrsystemback.onrender.com/products')
             .then(response => response.json())
-            .then(data => {
-                // Inicializa un arreglo para mantener las promesas
-                const qrPromises = data.map(product => {
-                    // Llama a getQR para cada producto y devuelve la promesa
-                    return getQR(product.productid).then(qrCode => {
-                        // Retorna un nuevo objeto de producto con la propiedad qrCode
-                        return { ...product, qrCode };
-                    });
-                });
-    
-                // Espera a que todas las promesas se resuelvan
-                Promise.all(qrPromises).then(productsWithQR => {
-                    // Actualiza el estado con los nuevos productos incluyendo los códigos QR
-                    setProds(productsWithQR);
-                });
+            .then(data => setProds(data))
+            .catch(error => console.error(error));
+    };
+
+    const deleteProduct = (productid) => {
+        fetch(`https://qrsystemback.onrender.com/products/${productid}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => {
+                if (!response.ok) {
+                    // Si el servidor responde con un error, lanzar una excepción
+                    return response.text().then(text => { throw new Error(text) });
+                }
+                // Si la respuesta es exitosa, actualizar la lista de productos
+                // No necesitas parsear la respuesta como JSON si esperas texto plano
+                actualizarListaProductos();
             })
             .catch(error => {
-                console.log(error)
-            });
-    }, []);
-    
-    const getQR = (productid) => {
-        //https://qrsystemback.onrender.com/products/${productid}
-        // Retorna la promesa fetch para que pueda ser utilizada en Promise.all
-        return fetch(`https://qrsystemback.onrender.com/products/${productid}`)
-            .then(response => response.json())
-            .then(data => {
-                // Suponiendo que la respuesta incluye un campo qrCode
-                return data.qrCode;
+                console.error('Error al eliminar el producto:', error);
+                alert(error.message); // Muestra el mensaje de error
             });
     }
-    
+
+
+
+
     function formatToDDMMYYYY(dateString) {
         // Creamos un objeto de fecha a partir de tu cadena con formato ISO
         let date = new Date(dateString);
@@ -59,53 +64,75 @@ const ProductosItems = () => {
         // Construimos la cadena con el formato DD/MM/YYYY
         return `${day}/${month}/${year}`;
     }
+    const getQR = async (productid) => {
+        const response = await fetch(`https://qrsystemback.onrender.com/products/${productid}`);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        return data.qrCode;
+    };
+
+    const printImage = async (productid) => {
+        try {
+            const qrCode = await getQR(productid);
+            const content = `<html><body><img src="${qrCode}" onload="window.print()" onerror="alert('Error al cargar la imagen');" /></body></html>`;
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(content);
+            printWindow.document.addEventListener('load', () => {
+                printWindow.print();
+                printWindow.close();
+            }, true);
+        } catch (error) {
+            console.error('Error al obtener el código QR:', error);
+            alert('No se pudo cargar el código QR para la impresión.');
+        }
+    };
 
     return (
         <div>
-            {
-                prods.map(({productid,name,code,date,quantity,idealstock,missingstock,qrCode}) => (
-                    
-                    <MDBListGroupItem
-                        key={productid}
-                        className="container align-items-center justify-content-center"
-                    >
-                        <div className="row align-items-center">
-                            <div className="col ms-4">
-                                <p className="mb-0 text-dark">{name}</p>
-                            </div>
-                            <div className="col ms-5">
-                                <p className="mb-0 text-dark">{code}</p>
-                            </div>
-                            <div className="col ms-5">
-                                <p className="mb-0 text-dark">{formatToDDMMYYYY(date)}</p>
-                            </div>
-                            <div className="col ms-5">
-                                <p className="mb-0 text-dark">{quantity}</p>
-                            </div>
-                            <div className="col ms-5">
-                                <p className="mb-0 text-dark">{idealstock}</p>
-                            </div>
-                            <div className="col ms-5">
-                                <p className="mb-0 text-dark">{missingstock}</p>
-                            </div>
-                            <div className="col ms-5">
-                                <p className="mb-0 text-dark">
-                                    <img src={qrCode} alt="" />
-                                    {/* <button className="btn btn-primary" onClick={() => { nav(`/qrProducto`, { state: {detailProd:{productid,name,code,date,quantity,idealstock,missingstock}} })}}>
-                                        <BsEyeFill></BsEyeFill>
-                                    </button> */}
+            {prods.map(({ productid, name, code, date, quantity, idealstock, missingstock, qrCode }) => (
+                <MDBListGroupItem key={productid} className="container align-items-center justify-content-center">
 
-                                </p>
-                            </div>
+                    <div className="row w-100">
+                        <div className="col d-flex justify-content-center align-items-center  ">
+                            <p className="mb-0 text-dark">{name}</p>
                         </div>
+                        <div className="col d-flex justify-content-center align-items-center  ">
+                            <p className="mb-0 text-dark">{code}</p>
+                        </div>
+                        <div className="col d-flex justify-content-center align-items-center  ">
+                            <p className="mb-0 text-dark">{formatToDDMMYYYY(date)}</p>
+                        </div>
+                        <div className="col d-flex justify-content-center align-items-center  ">
+                            <p className="mb-0 text-dark">{quantity}</p>
+                        </div>
+                        <div className="col d-flex justify-content-center align-items-center  ">
+                            <p className="mb-0 text-dark">{idealstock}</p>
+                        </div>
+                        <div className="col d-flex justify-content-center align-items-center  ">
+                            <p className="mb-0 text-dark">{missingstock}</p>
+                        </div>
+                        <div className="col d-flex justify-content-end align-items-center gap-2 me-0">
 
+                            <section>
+                                <Popup trigger={<div><BsPencilFill className="icon " cursor={"pointer"} /></div>} position="center center" modal>
+                                    {close => <ABMProductos productid={productid} close={close} actualizarListaProductos={actualizarListaProductos}></ABMProductos>}
+                                </Popup>
+                            </section>
+                            <section>
+                                <BsPrinterFill className="icon " cursor={"pointer"} onClick={() => printImage(productid)} />
+                            </section>
+                            <section>
+                                <BsTrash3Fill className="icon " cursor={"pointer"} onClick={() => deleteProduct(productid)} />
+                            </section>
+                        </div>
+                    </div>
 
-                    </MDBListGroupItem>
-                ))
-            }
-
-        </div >
-    )
+                </MDBListGroupItem>
+            ))}
+        </div>
+    );
 }
 
 export default ProductosItems

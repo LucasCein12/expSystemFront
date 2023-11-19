@@ -8,7 +8,7 @@ import './App.css'
 import Header from './Components/Header/Header'
 import Productos from './Components/Productos/Productos'
 import DetalleProducto from './Components/Productos/DetalleProducto'
-import QrProduct from './Components/Productos/QrProduct'
+
 
 function App() {
   const [openSidebarToggle, setOpenSidebarToggle] = useState(false)
@@ -31,12 +31,10 @@ function App() {
             }
           />
           <Route
-            path='/qrProducto'
-            element={<div className='grid-container'>
-              <Header OpenSidebar={OpenSidebar} />
-              <Sidebar openSidebarToggle={openSidebarToggle} OpenSidebar={OpenSidebar} />
-              <QrProduct></QrProduct>
-            </div>
+
+            path='/products/:productid'
+            element={
+              <DetalleProducto></DetalleProducto>
             }
           />
           <Route
