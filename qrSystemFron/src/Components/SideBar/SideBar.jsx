@@ -31,11 +31,12 @@ function Sidebar({openSidebarToggle, OpenSidebar}) {
                     <BsFillGrid3X3GapFill className='icon'/> Productos
                 </NavLink>
             </li>
-            {/* <li className='sidebar-list-item'>
-                <NavLink to={"/pagos"}>
+           <li className='sidebar-list-item'>
+                <NavLink to={"/products/24"}>
                     <BsCashCoin className='icon'/> Pagos
                 </NavLink>
             </li>
+             {/* 
             <li className='sidebar-list-item'>
                 <NavLink to={"/bill"}>
                     <BsFileEarmarkText className='icon'/> Facturas

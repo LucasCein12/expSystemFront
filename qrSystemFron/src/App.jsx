@@ -31,7 +31,6 @@ function App() {
             }
           />
           <Route
-
             path='/products/:productid'
             element={
               <DetalleProducto></DetalleProducto>
