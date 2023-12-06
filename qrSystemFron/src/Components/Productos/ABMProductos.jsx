@@ -157,7 +157,6 @@ const ABMProductos = ({ close, productid, actualizarListaProductos }) => {
                         title: <strong>Se ha actualizado con Exito!</strong>,
                         icon: 'success',
                         preConfirm: () => {
-                            actualizarListaProductos();
                             navigate("/productos")
                         }
                     })

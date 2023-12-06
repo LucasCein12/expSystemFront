@@ -13,7 +13,7 @@ const ProductosItems = ({ productos }) => {
 
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = currentPage * itemsPerPage;
-    const currentItems = productos.slice(startIndex, endIndex);
+    let currentItems = productos.slice(startIndex, endIndex);
 
     const handlePreviousPage = () => {
         setCurrentPage(Math.max(currentPage - 1, 1));
@@ -33,7 +33,9 @@ const ProductosItems = ({ productos }) => {
         fetch('https://qrsystemback.onrender.com/products')
             .then(response => response.json())
             .then(data => setProds(data))
+            .then(data=>currentItems = data.slice(startIndex, endIndex))
             .catch(error => console.error(error));
+
     };
 
     const deleteProduct = (productid) => {
