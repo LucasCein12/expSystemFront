@@ -20,7 +20,8 @@ const Productos = () => {
         fetch('https://qrsystemback.onrender.com/products')
             .then(response => response.json())
             .then(data => {
-                setProductos(data); // Actualizar el estado con la nueva lista de productos
+                setProductos(data);
+                // Actualizar el estado con la nueva lista de productos
             })
             .catch(error => {
                 console.error(error);
@@ -227,7 +228,7 @@ const Productos = () => {
                     </section>
                 </section>
 
-                <ProductosItems productos={productosOrdenados} />
+                <ProductosItems productos={productosOrdenados} actualizarListaProductos={actualizarListaProductos} />
             </MDBListGroup>
         </section>
     );

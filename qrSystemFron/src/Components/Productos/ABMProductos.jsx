@@ -45,7 +45,7 @@ const ABMProductos = ({ close, productid, actualizarListaProductos }) => {
     console.log(articulos)
     const handleChange = (e) => {
         const { name, value } = e.target;
-
+        console.log(name,value)
         if (name === "date") {
             // Convierte el valor del input y la fecha actual a formato YYYY-MM-DD
             const inputDate = new Date(value).toISOString().split('T')[0];
@@ -69,7 +69,7 @@ const ABMProductos = ({ close, productid, actualizarListaProductos }) => {
         }
         else {
             // Manejo de otros campos
-            if (name === 'quantity' || name === 'idealstock') {
+            if (name === 'quantityb' || name === 'quantityu' || name === 'idealstock') {
                 setProducto({ ...producto, [name]: value === '' ? '' : Number(value) });
             }
             else {
@@ -109,16 +109,17 @@ const ABMProductos = ({ close, productid, actualizarListaProductos }) => {
                                 return response.text().then(text => { throw new Error(text) });
                             }
                             const MySwal = withReactContent(Swal)
+                            console.log('entropa')
                             MySwal.fire({
                                 title: <strong>Se ha eliminado con Exito!</strong>,
                                 icon: 'success',
                                 preConfirm: () => {
-                                    navigate("/productos")
+                                    actualizarListaProductos();
                                 }
                             })
                             // Si la respuesta es exitosa, actualizar la lista de productos
                             // No necesitas parsear la respuesta como JSON si esperas texto plano
-                            actualizarListaProductos();
+                            
                         })
                         .catch(error => {
                             console.error('Error al eliminar el producto:', error);
@@ -133,7 +134,7 @@ const ABMProductos = ({ close, productid, actualizarListaProductos }) => {
             ; // Prevenir el comportamiento por defecto de envío del formulario
 
             // Verificar si todos los campos están llenos
-            if (!producto.name || !producto.code || !producto.quantityb || !producto.quantityu || !producto.idealstock) {
+            if (!producto.name || !producto.code || !producto.idealstock) {
                 setError("Todos los campos son obligatorios");
                 return;
             }
@@ -239,7 +240,7 @@ const ABMProductos = ({ close, productid, actualizarListaProductos }) => {
                         <label htmlFor="quantityb">Bultos:</label>
                         <div className="input-group">
                             <button className="btn btn-success btn-sm" type="button" onClick={() => handleBultoChange('r')}><FaMinus /></button>
-                            <input type="number" className="form-control" id="quantityb" name="quantityb" placeholder="Ingrese Stock" onChange={handleChange} value={producto.quantityb} required />
+                            <input type="number" className="form-control text-center" id="quantityb" name="quantityb" placeholder="Ingrese Stock" onChange={handleChange} value={producto.quantityb} required />
                             <button className="btn btn-success btn-sm" type="button" onClick={() => handleBultoChange('s')}><FaPlus /></button>
                         </div>
                     </div>
@@ -247,7 +248,7 @@ const ABMProductos = ({ close, productid, actualizarListaProductos }) => {
                         <label htmlFor="quantityu">Unidades:</label>
                         <div className="input-group">
                             <button className="btn btn-success btn-sm" type="button" onClick={() => handleUnitChange('r')}><FaMinus /></button>
-                            <input type="number" className="form-control" id="quantityu" name="quantityu" placeholder="Ingrese Stock" onChange={handleChange} value={producto.quantityu} required />
+                            <input type="number" className="form-control text-center" id="quantityu" name="quantityu" placeholder="Ingrese Stock" onChange={handleChange} value={producto.quantityu} required />
                             <button className="btn btn-success btn-sm" type="button" onClick={() => handleUnitChange('s')}><FaPlus /></button>
                         </div>
                     </div>

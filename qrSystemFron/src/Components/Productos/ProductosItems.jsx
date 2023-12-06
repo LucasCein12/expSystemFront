@@ -6,7 +6,9 @@ import Popup from "reactjs-popup";
 import { BsPrinterFill } from "react-icons/bs";
 import { BsPencilFill } from "react-icons/bs";
 import ABMProductos from "./ABMProductos";
-const ProductosItems = ({ productos }) => {
+import Swal from 'sweetalert2'
+import withReactContent from 'sweetalert2-react-content'
+const ProductosItems = ({ productos, actualizarListaProductos }) => {
     const [prods, setProds] = useState([])
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 5;
@@ -28,37 +30,52 @@ const ProductosItems = ({ productos }) => {
             setProds(productos)
         }
     }, [productos]);
-    const actualizarListaProductos = () => {
-        // Aquí se hace la llamada a la API para obtener la lista actualizada de productos
-        fetch('https://qrsystemback.onrender.com/products')
-            .then(response => response.json())
-            .then(data => setProds(data))
-            .then(data=>currentItems = data.slice(startIndex, endIndex))
-            .catch(error => console.error(error));
-
-    };
+    
 
     const deleteProduct = (productid) => {
-        fetch(`https://qrsystemback.onrender.com/products/${productid}`, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json'
+        const MySwal = withReactContent(Swal);
+    
+        // Mostrar un modal de confirmación
+        MySwal.fire({
+            title: '¿Estás seguro?',
+            text: "Esta acción no se puede deshacer",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, eliminarlo!',
+            cancelButtonText: 'No, cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Si el usuario confirma, proceder con la eliminación
+                fetch(`https://qrsystemback.onrender.com/products/${productid}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        // Si el servidor responde con un error, lanzar una excepción
+                        throw new Error(response.statusText);
+                    }
+                    // Mostrar mensaje de éxito
+                    MySwal.fire(
+                        'Eliminado!',
+                        'El producto ha sido eliminado.',
+                        'success'
+                    );
+                    // Actualizar lista de productos
+                    actualizarListaProductos();
+                })
+                .catch(error => {
+                    console.error('Error al eliminar el producto:', error);
+                    Swal.fire('Error', error.message, 'error'); // Mostrar mensaje de error
+                });
             }
-        })
-            .then(response => {
-                if (!response.ok) {
-                    // Si el servidor responde con un error, lanzar una excepción
-                    return response.text().then(text => { throw new Error(text) });
-                }
-                // Si la respuesta es exitosa, actualizar la lista de productos
-                // No necesitas parsear la respuesta como JSON si esperas texto plano
-                actualizarListaProductos();
-            })
-            .catch(error => {
-                console.error('Error al eliminar el producto:', error);
-                alert(error.message); // Muestra el mensaje de error
-            });
-    }
+        });
+    };
+    
 
     //rojo cuando esta vencido, amarillo 30 dias o menos, naranja 60 dias o menos y verde el resto
     const generateSquareColor = (productDate) => {
