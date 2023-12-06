@@ -50,7 +50,6 @@ const Detallespanroducto = () => {
                 <span className="text-dark">Fecha de Vencimiento: {formatToDDMMYYYY(prod.date)}</span>
                 <span className="text-dark">Stock Ideal: {prod.idealstock}</span>
                 <span className="text-dark">Stock Faltante: {prod.missingstock}</span>
-                <img src={prod.qrCode} alt='Qr Code' />
             </section>
         </section>
 
