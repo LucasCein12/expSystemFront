@@ -1,8 +1,4 @@
 import { createContext, useRef, useState } from "react";
-
-
-
-
 export const ProvRouteContext= createContext()
 export const MyProvider = ({ children }) => {
     const [value, setValue] = useState()

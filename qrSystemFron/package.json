@@ -15,10 +15,13 @@
     "mdb-react-ui-kit": "^7.0.0",
     "react": "^18.2.0",
     "react-bootstrap": "^2.9.1",
+    "react-datepicker": "^4.24.0",
     "react-dom": "^18.2.0",
     "react-icons": "^4.12.0",
     "react-router-dom": "^6.18.0",
-    "reactjs-popup": "^2.0.6"
+    "reactjs-popup": "^2.0.6",
+    "sweetalert2": "^11.10.1",
+    "sweetalert2-react-content": "^5.0.7"
   },
   "devDependencies": {
     "@types/react": "^18.2.15",

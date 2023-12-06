@@ -8,8 +8,21 @@ import { BsPencilFill } from "react-icons/bs";
 import ABMProductos from "./ABMProductos";
 const ProductosItems = ({ productos }) => {
     const [prods, setProds] = useState([])
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 5;
 
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = currentPage * itemsPerPage;
+    const currentItems = productos.slice(startIndex, endIndex);
 
+    const handlePreviousPage = () => {
+        setCurrentPage(Math.max(currentPage - 1, 1));
+    };
+
+    const handleNextPage = () => {
+        const totalPages = Math.ceil(productos.length / itemsPerPage);
+        setCurrentPage(Math.min(currentPage + 1, totalPages));
+    };
     useEffect(() => {
         if (productos) {
             setProds(productos)
@@ -45,7 +58,28 @@ const ProductosItems = ({ productos }) => {
             });
     }
 
+    //rojo cuando esta vencido, amarillo 30 dias o menos, naranja 60 dias o menos y verde el resto
+    const generateSquareColor = (productDate) => {
+        const today = new Date();
+        const expirationDate = new Date(productDate);
 
+        // Calcula la diferencia en días
+        const differenceInTime = expirationDate.getTime() - today.getTime();
+        const differenceInDays = differenceInTime / (1000 * 3600 * 24);
+
+        // Determina el color basado en la diferencia de días
+        if (differenceInDays < 0) {
+            return "red"; // Producto vencido
+        } else if (differenceInDays <= 14) {
+            return "orange"; // Faltan 14 días o menos
+        } else if (differenceInDays <= 30) {
+            return "yellow"; // Faltan entre 15 y 30 días
+        } else if (differenceInDays <= 90) {
+            return "green"; // Faltan entre 30 y 90 días
+        } else {
+            return "grey"; // Más de 90 días o fecha inválida
+        }
+    };
 
 
     function formatToDDMMYYYY(dateString) {
@@ -76,7 +110,30 @@ const ProductosItems = ({ productos }) => {
     const printImage = async (productid) => {
         try {
             const qrCode = await getQR(productid);
-            const content = `<html><body><img src="${qrCode}" onload="window.print()" onerror="alert('Error al cargar la imagen');" /></body></html>`;
+            const content = `
+                <html>
+                <head>
+                    <style>
+                        body {
+                            margin: 0;
+                            padding: 0;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            height: 100vh;
+                        }
+                        img {
+                            max-width: 90%;
+                            max-height: 90%;
+                            width: auto;
+                            height: auto;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <img src="${qrCode}" onload="window.print()" onerror="alert('Error al cargar la imagen');" />
+                </body>
+                </html>`;
             const printWindow = window.open('', '_blank');
             printWindow.document.write(content);
             printWindow.document.addEventListener('load', () => {
@@ -89,32 +146,39 @@ const ProductosItems = ({ productos }) => {
         }
     };
 
+
     return (
         <div>
-            {prods.map(({ productid, name, code, date, quantity, idealstock, missingstock, qrCode }) => (
-                <MDBListGroupItem key={productid} className="container align-items-center justify-content-center">
+            {currentItems.map(({ productid, name, code, date, quantityu, quantityb }) => (
+                <MDBListGroupItem key={productid} className="container align-items-center justify-content-center" >
 
                     <div className="row w-100">
-                        <div className="col d-flex justify-content-center align-items-center  ">
+                        <div className="col-12 col-md-2 d-flex justify-content-center ">
+                            <div className="color-square" style={{ backgroundColor: generateSquareColor(date) }}></div>
+                        </div>
+                        <div className="col-12 col-md-2 d-flex justify-content-center align-items-center  ">
                             <p className="mb-0 text-dark">{name}</p>
                         </div>
-                        <div className="col d-flex justify-content-center align-items-center  ">
+                        <div className="col-12 col-md-2 d-flex justify-content-center align-items-center  ">
                             <p className="mb-0 text-dark">{code}</p>
                         </div>
-                        <div className="col d-flex justify-content-center align-items-center  ">
+                        <div className="col-12 col-md-2 d-flex justify-content-center align-items-center  ">
                             <p className="mb-0 text-dark">{formatToDDMMYYYY(date)}</p>
                         </div>
-                        <div className="col d-flex justify-content-center align-items-center  ">
-                            <p className="mb-0 text-dark">{quantity}</p>
+                        <div className="col-12 col-md-1 d-flex justify-content-center align-items-center  ">
+                            <p className="mb-0 text-dark">{quantityu}</p>
                         </div>
-                        <div className="col d-flex justify-content-center align-items-center  ">
+                        <div className="col-12 col-md-1 d-flex justify-content-center align-items-center  ">
+                            <p className="mb-0 text-dark">{quantityb}</p>
+                        </div>
+                        {/* <div className="col d-flex justify-content-center align-items-center  ">
                             <p className="mb-0 text-dark">{idealstock}</p>
                         </div>
                         <div className="col d-flex justify-content-center align-items-center  ">
                             <p className="mb-0 text-dark">{missingstock}</p>
-                        </div>
-                        <div className="col d-flex justify-content-end align-items-center gap-2 me-0">
+                        </div> */}
 
+                        <div className="col-12 col-md-2 d-flex justify-content-center align-items-center gap-2 ">
                             <section>
                                 <Popup trigger={<div><BsPencilFill className="icon " cursor={"pointer"} /></div>} position="center center" modal>
                                     {close => <ABMProductos productid={productid} close={close} actualizarListaProductos={actualizarListaProductos}></ABMProductos>}
@@ -131,6 +195,25 @@ const ProductosItems = ({ productos }) => {
 
                 </MDBListGroupItem>
             ))}
+            <section className="d-flex justify-content-center align-items-center mt-3">
+
+                <button
+                    style={{ margin: "5px" }}
+                    className="btn btn-secondary"
+                    onClick={handlePreviousPage}
+                    disabled={currentPage === 1}
+                >
+                    Previous
+                </button>
+                <button
+                    style={{ margin: "5px" }}
+                    className="btn btn-secondary"
+                    onClick={handleNextPage}
+                    disabled={endIndex >= productos.length}
+                >
+                    Next
+                </button>
+            </section>
         </div>
     );
 }
