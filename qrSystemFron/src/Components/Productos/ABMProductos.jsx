@@ -157,9 +157,11 @@ const ABMProductos = ({ close, productid, actualizarListaProductos }) => {
                         title: <strong>Se ha actualizado con Exito!</strong>,
                         icon: 'success',
                         preConfirm: () => {
+                            actualizarListaProductos();
                             navigate("/productos")
                         }
                     })
+                    
                     const resultado = await respuesta.json();
                     console.log('Producto actualizado con：', resultado);
                     close(); // Cerrar el modal o resetear el formulario como sea necesario
