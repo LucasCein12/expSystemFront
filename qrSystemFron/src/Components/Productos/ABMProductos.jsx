@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 import './css/abmprods.css'
-const ABMProductos = ({ close, productid, actualizarListaProductos }) => {
+const ABMProductos = ({ close, productid, productos, actualizarListaProductos }) => {
     const navigate = useNavigate()
     const [articulos, setArticulos] = useState([])
     const [suggestions, setSuggestions] = useState([]);
@@ -45,7 +45,7 @@ const ABMProductos = ({ close, productid, actualizarListaProductos }) => {
     console.log(articulos)
     const handleChange = (e) => {
         const { name, value } = e.target;
-        console.log(name,value)
+        console.log(name, value)
         if (name === "date") {
             // Convierte el valor del input y la fecha actual a formato YYYY-MM-DD
             const inputDate = new Date(value).toISOString().split('T')[0];
@@ -78,7 +78,28 @@ const ABMProductos = ({ close, productid, actualizarListaProductos }) => {
         }
     };
 
-
+    function formatToDDMMYYYY(dateString) {
+        // Dividimos la cadena de fecha en sus componentes (año, mes, día)
+        let dateParts = dateString.split('-');
+    
+        // Convertimos los componentes en números enteros
+        // Date interpreta los meses desde 0 (enero) hasta 11 (diciembre), por lo que restamos 1 al mes
+        let year = parseInt(dateParts[0], 10);
+        let month = parseInt(dateParts[1], 10) - 1;
+        let day = parseInt(dateParts[2], 10);
+    
+        // Creamos un objeto de fecha con los componentes
+        let date = new Date(year, month, day);
+    
+        // Obtenemos el día, mes y año del objeto de fecha
+        // Asegurándonos de añadir un cero delante si es menor de 10
+        let formattedDay = ('0' + date.getDate()).slice(-2);
+        let formattedMonth = ('0' + (date.getMonth() + 1)).slice(-2);
+        let formattedYear = date.getFullYear();
+    
+        // Construimos la cadena con el formato DD/MM/YYYY
+        return `${formattedDay}/${formattedMonth}/${formattedYear}`;
+    }
     const handleBultoChange = (aux) => {
 
         aux == 's' ? setProducto({ ...producto, quantityb: parseInt(producto.quantityb) + 1 }) : parseInt(producto.quantityb) > 0 && setProducto({ ...producto, quantityb: parseInt(producto.quantityb) - 1 });
@@ -119,7 +140,7 @@ const ABMProductos = ({ close, productid, actualizarListaProductos }) => {
                             })
                             // Si la respuesta es exitosa, actualizar la lista de productos
                             // No necesitas parsear la respuesta como JSON si esperas texto plano
-                            
+
                         })
                         .catch(error => {
                             console.error('Error al eliminar el producto:', error);
@@ -161,7 +182,7 @@ const ABMProductos = ({ close, productid, actualizarListaProductos }) => {
                             navigate("/productos")
                         }
                     })
-                    
+
                     const resultado = await respuesta.json();
                     console.log('Producto actualizado con：', resultado);
                     close(); // Cerrar el modal o resetear el formulario como sea necesario
@@ -170,36 +191,74 @@ const ABMProductos = ({ close, productid, actualizarListaProductos }) => {
                     setError(error.message);
                 }
             }
+            //art.code == producto.code && formatToDDMMYYYY(art.date) == producto.date
             else {
+                const productoExistente = productos.find(art =>art.code == producto.code && formatToDDMMYYYY(art.date) == formatToDDMMYYYY(producto.date) );
+                console.log(productoExistente)
+                if (productoExistente) {
+                    // Actualizar cantidades del producto existente
+                    const productoActualizado = {
+                        ...productoExistente,
+                        quantityb: productoExistente.quantityb + producto.quantityb,
+                        quantityu: productoExistente.quantityu + producto.quantityu
+                    };
+                    try {
+                        const respuesta = await fetch(`https://qrsystemback.onrender.com/products`, {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(productoActualizado)
+                        });
 
-                // Si todo está correcto, intenta hacer el POST
-                try {
-                    const respuesta = await fetch('https://qrsystemback.onrender.com/products', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(producto)
-                    });
-
-                    if (!respuesta.ok) {
-                        throw new Error(`HTTP error! status: ${respuesta.status}`);
-                    }
-                    const MySwal = withReactContent(Swal)
-                    MySwal.fire({
-                        title: <strong>Se ha agregado con Exito!</strong>,
-                        icon: 'success',
-                        preConfirm: () => {
-                            navigate("/productos")
+                        if (!respuesta.ok) {
+                            throw new Error(`HTTP error! status: ${respuesta.status}`);
                         }
-                    })
-                    const resultado = await respuesta.json();
-                    console.log('Producto agregado con éxito:', resultado);
-                    close(); // Cerrar el modal o resetear el formulario como sea necesario
-                } catch (error) {
-                    console.error('Error al agregar el producto:', error);
-                    setError(error.message);
+                        const MySwal = withReactContent(Swal)
+                        MySwal.fire({
+                            title: <strong>Se ha agregado con Exito!</strong>,
+                            icon: 'success',
+                            preConfirm: () => {
+                                navigate("/productos")
+                            }
+                        })
+                        // Código para manejar la respuesta exitosa
+                    } catch (error) {
+                        console.error('Error al actualizar el producto:', error);
+                        setError(error.message);
+                    }
                 }
+                else {
+
+                    try {
+                        const respuesta = await fetch('https://qrsystemback.onrender.com/products', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(producto)
+                        });
+
+                        if (!respuesta.ok) {
+                            throw new Error(`HTTP error! status: ${respuesta.status}`);
+                        }
+                        const MySwal = withReactContent(Swal)
+                        MySwal.fire({
+                            title: <strong>Se ha agregado con Exito!</strong>,
+                            icon: 'success',
+                            preConfirm: () => {
+                                navigate("/productos")
+                            }
+                        })
+                        const resultado = await respuesta.json();
+                        console.log('Producto agregado con éxito:', resultado);
+                        close(); // Cerrar el modal o resetear el formulario como sea necesario
+                    } catch (error) {
+                        console.error('Error al agregar el producto:', error);
+                        setError(error.message);
+                    }
+                }
+                // Si todo está correcto, intenta hacer el POST
             }
             actualizarListaProductos();
         }
@@ -211,7 +270,7 @@ const ABMProductos = ({ close, productid, actualizarListaProductos }) => {
             <h1 className="text-center text-dark mb-4">{productid ? 'Editar Producto' : 'Agregar Producto'}</h1>
             <form onSubmit={handleSubmit} className="mx-auto" style={{ maxWidth: '500px' }}>
                 <section className="row mb-3">
-                <label htmlFor="name" className="col-sm-4 col-form-label">Codigo:</label>
+                    <label htmlFor="name" className="col-sm-4 col-form-label">Codigo:</label>
                     <div className="col-sm-8">
                         <input type="text" className="form-control" id="code" name="code" placeholder="Codigo" onChange={handleChange} value={producto.code} disabled={!!productid} required />
                     </div>
