@@ -41,17 +41,17 @@ const Detallespanroducto = () => {
     }
     console.log(prod)
     return (
-        <section className="d-flex justify-content-center align-items-center " >
-
-            <section className="d-flex justify-content-center  flex-column bg-white p-3 mt-4">
-                <h2 className="text-dark text-center">{prod.name}</h2>
+        <div className="d-flex justify-content-center align-items-center min-vh-100">
+            <section className="text-center bg-white p-3 mt-4 fs-4">
+                <h2 className="text-dark">{prod.name}</h2>
                 <span className="text-dark">Codigo: {prod.code}</span>
-                <span className="text-dark">Stock actual:</span>
-                <span className="ms-2"> -Bulto:{prod.quantityb} -Unidad:{prod.quantityu}</span>
-                <span className="text-dark">Fecha de Vencimiento: {formatToDDMMYYYY(prod.date)}</span>
-                <span className="text-dark">Stock Ideal: {prod.idealstock}</span>
+                <div className="text-dark">Stock actual:</div>
+                <div className="ms-2 text-dark">- Bulto: {prod.quantityb} - Unidad: {prod.quantityu}</div>
+                <div className="text-dark">Fecha de Vencimiento: {formatToDDMMYYYY(prod.date)}</div>
+                <div className="text-dark">Stock Ideal: {prod.idealstock}</div>
             </section>
-        </section>
+        </div>
+
 
     )
 }
