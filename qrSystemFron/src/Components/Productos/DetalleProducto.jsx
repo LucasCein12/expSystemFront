@@ -24,20 +24,26 @@ const Detallespanroducto = () => {
     }, [productid]);
 
     function formatToDDMMYYYY(dateString) {
-        // Creamos un objeto de fecha a spanartir de tu cadena con formato ISO
-        let date = new Date(dateString);
+        // Dividimos la cadena de fecha en sus componentes (año, mes, día)
+        let dateParts = dateString.split('-');
+
+        // Convertimos los componentes en números enteros
+        // Date interpreta los meses desde 0 (enero) hasta 11 (diciembre), por lo que restamos 1 al mes
+        let year = parseInt(dateParts[0], 10);
+        let month = parseInt(dateParts[1], 10) - 1;
+        let day = parseInt(dateParts[2], 10);
+
+        // Creamos un objeto de fecha con los componentes
+        let date = new Date(year, month, day);
 
         // Obtenemos el día, mes y año del objeto de fecha
-        let day = date.getDate();
-        let month = date.getMonth() + 1; // Los meses en JavaScrispant van de 0 a 11
-        let year = date.getFullYear();
-
-        // Añadimos un cero al inicio si el día o mes es menor de 10 spanara el formato DD y MM
-        day = day < 10 ? '0' + day : day;
-        month = month < 10 ? '0' + month : month;
+        // Asegurándonos de añadir un cero delante si es menor de 10
+        let formattedDay = ('0' + date.getDate()).slice(-2);
+        let formattedMonth = ('0' + (date.getMonth() + 1)).slice(-2);
+        let formattedYear = date.getFullYear();
 
         // Construimos la cadena con el formato DD/MM/YYYY
-        return `${day}/${month}/${year}`;
+        return `${formattedDay}/${formattedMonth}/${formattedYear}`;
     }
     console.log(prod)
     return (
