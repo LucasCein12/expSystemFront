@@ -50,6 +50,7 @@ const Detallespanroducto = () => {
         <div className="d-flex justify-content-center align-items-center min-vh-100">
             <section className="text-center bg-white p-3 mt-4 fs-4">
                 <h2 className="text-dark">{prod.name}</h2>
+                <hr />
                 <span className="text-dark">Codigo: {prod.code}</span>
                 <div className="text-dark">Stock actual:</div>
                 <div className="ms-2 text-dark">- Bulto: {prod.quantityb} - Unidad: {prod.quantityu}</div>
