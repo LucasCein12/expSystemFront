@@ -22,7 +22,7 @@ const Detallespanroducto = () => {
 
         cargarDatosProducto();
     }, [productid]);
-    console.log(prod.date)
+    console.log(prod)
     function formatToDDMMYYYY(dateString) {
         // Dividimos la cadena de fecha en sus componentes (año, mes, día)
         let dateParts = dateString.split('-');
