@@ -7,6 +7,9 @@ import ABMProductos from "./ABMProductos";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "./css/prodsCss.css"
+import * as FileSaver from 'file-saver';
+import * as XLSX from 'xlsx';
+
 const Productos = () => {
     const [productos, setProductos] = useState([]);
     const [prodsFiltrados, setProdsFiltrados] = useState([])
@@ -39,7 +42,49 @@ const Productos = () => {
             direccion: ordenActual.direccion === 'asc' && ordenActual.columna === columna ? 'desc' : 'asc'
         }));
     };
+    function formatToDDMMYYYY(dateString) {
+        // Dividimos la cadena de fecha en sus componentes (año, mes, día)
+        let dateParts = dateString.split('-');
+    
+        // Convertimos los componentes en números enteros
+        // Date interpreta los meses desde 0 (enero) hasta 11 (diciembre), por lo que restamos 1 al mes
+        let year = parseInt(dateParts[0], 10);
+        let month = parseInt(dateParts[1], 10) - 1;
+        let day = parseInt(dateParts[2], 10);
+    
+        // Creamos un objeto de fecha con los componentes
+        let date = new Date(year, month, day);
+    
+        // Obtenemos el día, mes y año del objeto de fecha
+        // Asegurándonos de añadir un cero delante si es menor de 10
+        let formattedDay = ('0' + date.getDate()).slice(-2);
+        let formattedMonth = ('0' + (date.getMonth() + 1)).slice(-2);
+        let formattedYear = date.getFullYear();
+    
+        // Construimos la cadena con el formato DD/MM/YYYY
+        return `${formattedDay}/${formattedMonth}/${formattedYear}`;
+    }
+    const mapDataForExcel = (data) => {
+        return data.map(item => ({
+            'Nombre': item.name,
+            'Codigo': item.code,
+            'Fecha Vencimiento': formatToDDMMYYYY(item.date), // Assuming 'date' is already formatted as needed
+            'Cantidad Unid.': item.quantityu,
+            'Cantidad Bulto': item.quantityb
+        }));
+    }
+    
+    const exportToExcel = (apiData, fileName) => {
+        const mappedData = mapDataForExcel(apiData);
+        const fileType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
+        const fileExtension = '.xlsx';
 
+        const ws = XLSX.utils.json_to_sheet(mappedData);
+        const wb = { Sheets: { 'data': ws }, SheetNames: ['data'] };
+        const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+        const data = new Blob([excelBuffer], { type: fileType });
+        FileSaver.saveAs(data, fileName + fileExtension);
+    }
 
     const ordenarProductos = (productos) => {
         return productos.sort((a, b) => {
@@ -187,6 +232,12 @@ const Productos = () => {
 
             <MDBListGroup className="mt-3">
                 <section className="d-flex justify-content-end mb-3">
+                    <button
+                        className="btn btn-primary me-3"
+                        onClick={() => exportToExcel(productosOrdenados, 'Productos')}
+                    >
+                        <i className="fa fa-file-excel-o"></i> Descargar Excel
+                    </button>
                     <Popup trigger={<button className="btn btn-success" style={{ marginRight: '10%' }}>Agregar Nuevo</button>} modal position={'center center'}>
                         {close => <ABMProductos close={close} productos={productos} actualizarListaProductos={actualizarListaProductos}></ABMProductos>}
                     </Popup>
@@ -194,34 +245,34 @@ const Productos = () => {
 
                 <section className="container pt-1 rounded d-none d-md-flex align-items-center justify-content-center bg-black">
                     <section className="row w-100">
-                        <section className="col-12 col-md-2 d-flex justify-content-center">
+                        <section className="col-12 col-md d-flex justify-content-center">
                         </section>
-                        
-                        <section className="col-12 col-md-2 d-flex justify-content-center">
+
+                        <section className="col-12 col-md d-flex justify-content-center">
                             <p className="fw-bold text-light mb-0 cursor-pointer d-none d-md-block" onClick={() => cambiarOrden('name')}>Nombre</p>
                         </section>
 
-                        
+
                         <section className="col-12 col-md d-flex justify-content-center">
                             <p className="fw-bold text-light mb-0 cursor-pointer d-none d-md-block" onClick={() => cambiarOrden('code')}>Codigo</p>
                         </section>
 
-                       
+
                         <section className="col-12 col-md d-flex justify-content-center">
-                            <p className="fw-bold text-light mb-0 cursor-pointer d-none d-md-block" onClick={() => cambiarOrden('date')}>Fecha Vencimiento</p>
+                            <p className="fw-bold text-light mb-0 cursor-pointer d-none d-md-block" onClick={() => cambiarOrden('date')}>Fecha Venc</p>
                         </section>
 
-                        
+
                         <section className="col-12 col-md d-flex justify-content-center">
-                            <p className="fw-bold text-light mb-0 cursor-pointer d-none d-md-block" onClick={() => cambiarOrden('quantityu')}>Cantidad Unid.</p>
+                            <p className="fw-bold text-light mb-0 cursor-pointer d-none d-md-block" onClick={() => cambiarOrden('quantityu')}>Cant Unid.</p>
                         </section>
 
-                        
+
                         <section className="col-12 col-md d-flex justify-content-center">
-                            <p className="fw-bold text-light mb-0 cursor-pointer d-none d-md-block" onClick={() => cambiarOrden('quantityb')}>Cantidad Bulto</p>
+                            <p className="fw-bold text-light mb-0 cursor-pointer d-none d-md-block" onClick={() => cambiarOrden('quantityb')}>Cant Bulto</p>
                         </section>
 
-                        
+
                         <section className="col-12 col-md d-flex justify-content-center ">
                             <p className="fw-bold text-light mb-0 d-none d-md-block">Acciones</p>
                         </section>

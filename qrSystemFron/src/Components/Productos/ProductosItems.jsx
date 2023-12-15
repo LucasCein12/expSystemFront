@@ -185,13 +185,13 @@ const ProductosItems = ({ productos, actualizarListaProductos }) => {
                         <div className="col-12 col-md-2 d-flex justify-content-center align-items-center  ">
                             <p className="mb-0 text-dark">{name}</p>
                         </div>
-                        <div className="col-12 col-md-2 d-flex justify-content-center align-items-center  ">
+                        <div className="col-12 col-md-1 d-flex justify-content-center align-items-center  ">
                             <p className="mb-0 text-dark">{code}</p>
                         </div>
                         <div className="col-12 col-md-2 d-flex justify-content-center align-items-center  ">
                             <p className="mb-0 text-dark">{formatToDDMMYYYY(date)}</p>
                         </div>
-                        <div className="col-12 col-md-1 d-flex justify-content-center align-items-center  ">
+                        <div className="col-12 col-md-2 d-flex justify-content-center align-items-center  ">
                             <p className="mb-0 text-dark">{quantityu}</p>
                         </div>
                         <div className="col-12 col-md-1 d-flex justify-content-center align-items-center  ">
@@ -204,10 +204,10 @@ const ProductosItems = ({ productos, actualizarListaProductos }) => {
                             <p className="mb-0 text-dark">{missingstock}</p>
                         </div> */}
 
-                        <div className="col-12 col-md-2 d-flex justify-content-center align-items-center gap-2 ">
+                        <div className="col-12 col-md-2 d-flex justify-content-end align-items-center gap-2 ">
                             <section>
                                 <Popup trigger={<div><BsPencilFill className="icon " cursor={"pointer"} /></div>} position="center center" modal>
-                                    {close => <ABMProductos productid={productid} close={close} actualizarListaProductos={actualizarListaProductos}></ABMProductos>}
+                                    {close => <ABMProductos productid={productid} close={close} actualizarListaProductos={actualizarListaProductos} productos={productos}></ABMProductos>}
                                 </Popup>
                             </section>
                             <section>
