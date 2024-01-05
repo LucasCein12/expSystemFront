@@ -9,9 +9,12 @@ const ABMProductos = ({ close, productid, productos, actualizarListaProductos })
     const navigate = useNavigate()
     const [articulos, setArticulos] = useState([])
     const [suggestions, setSuggestions] = useState([]);
+    const [suggestionP, setSuggestionP] = useState([]);
     const [inputValue, setInputValue] = useState('');
     const codeRef = useRef(null);
     const nameRef = useRef(null);
+    const codBarrasRef = useRef(null);
+    const codProvRef = useRef(null);
     const quantitybRef = useRef(null);
     const quantityuRef = useRef(null);
     const dateRef = useRef(null);
@@ -65,7 +68,9 @@ const ABMProductos = ({ close, productid, productos, actualizarListaProductos })
         quantityb: 0,
         quantityu: 0,
         date: '',
-        idealstock: ''
+        idealstock: '',
+        codbarras:'',
+        codprov:''
     });
     const [error, setError] = useState(""); // Estado para manejar los mensajes de error
     console.log(articulos)
@@ -93,6 +98,14 @@ const ABMProductos = ({ close, productid, productos, actualizarListaProductos })
                 setSuggestions([]);
             }
         }
+        else if(name=='name'){
+            setProducto({ ...producto, name: value });
+            if (value) {
+                setSuggestions(articulos.filter((art) => art.descripcion.toLowerCase().includes(value.toLowerCase())));
+            } else {
+                setSuggestions([]);
+            }
+        }
         else {
             // Manejo de otros campos
             if (name === 'quantityb' || name === 'quantityu' || name === 'idealstock') {
@@ -103,6 +116,17 @@ const ABMProductos = ({ close, productid, productos, actualizarListaProductos })
             }
         }
     };
+    const handleChangeBarras=(e)=>{
+        const {name,value}=e.target
+        if (value) {
+            setSuggestions(articulos.filter((art) => art[name].toLowerCase().includes(value.toLowerCase())));
+        } else {
+            setSuggestions([]);
+        }
+        setProducto({ ...producto, [name]: value })
+        const prod=articulos.find(art=>art[name]==value)
+        setProducto({...producto,code:prod.code,name:prod.descripcion,codbarras:prod.codbarras,codprov:prod.codprov})
+    }
     console.log(productos)
     const navigateToNextProduct = () => {
         const index = productos.findIndex(product => parseInt(product.productid) == parseInt(idprod));
@@ -379,8 +403,34 @@ const ABMProductos = ({ close, productid, productos, actualizarListaProductos })
                         <ul className="suggestions mt-5 w-50">
                             {suggestions.map((articulo, index) => (
                                 <li key={index} onClick={() => {
-                                    setProducto({ ...producto, code: articulo.code, name: articulo.descripcion.toLowerCase() });
+                                    setProducto({ ...producto, code: articulo.code, name: articulo.descripcion.toLowerCase(),codbarras:articulo.codbarras, codprov:articulo.codprov })
                                     setSuggestions([]);
+                                   
+                                }}>
+                                    {articulo.descripcion} ({articulo.code})
+                                </li>
+                            ))}
+                        </ul>
+                    )}
+                </section>
+                <section className="row mb-3">
+                    <label htmlFor="name" className="col-sm-4 col-form-label">Cod. Barras:</label>
+                    <div className="col-sm-8">
+                        <input type="text" className="form-control" id="codBarras" name="codbarras" ref={codBarrasRef} placeholder="Cod. Barras" onChange={handleChangeBarras} value={producto.codbarras} required />
+                    </div>
+                </section>
+                <section className="row mb-3">
+                    <label htmlFor="name" className="col-sm-4 col-form-label">Cod. Prov:</label>
+                    <div className="col-sm-8">
+                        <input type="text" className="form-control" id="codProv" name="codprov" ref={codProvRef} placeholder="Cod. Prov." onChange={handleChangeBarras} value={producto.codprov} required />
+                    </div>
+                    {suggestions.length > 0 && (
+                        <ul className="suggestions mt-5 w-50">
+                            {suggestions.map((articulo, index) => (
+                                <li key={index} onClick={() => {
+                                    setProducto({ ...producto, code: articulo.code, name: articulo.descripcion.toLowerCase(),codbarras:articulo.codbarras, codprov:articulo.codprov })
+                                    setSuggestions([]);
+                                    
                                 }}>
                                     {articulo.descripcion} ({articulo.code})
                                 </li>
@@ -391,8 +441,21 @@ const ABMProductos = ({ close, productid, productos, actualizarListaProductos })
                 <section className="row mb-3">
                     <label htmlFor="name" className="col-sm-4 col-form-label">Nombre:</label>
                     <div className="col-sm-8">
-                        <input type="text" className="form-control" id="name" name="name" ref={nameRef} placeholder="Nombre" onChange={handleChange} value={producto.name} disabled required />
+                        <input type="text" className="form-control" id="name" name="name" ref={nameRef} placeholder="Nombre" onChange={handleChange} value={producto.name} required />
                     </div>
+                    {suggestions.length > 0 && (
+                        <ul className="suggestions mt-5 w-50">
+                            {suggestions.map((articulo, index) => (
+                                <li key={index} onClick={() => {
+                                    setProducto({ ...producto, code: articulo.code, name: articulo.descripcion.toLowerCase(),codbarras:articulo.codbarras, codprov:articulo.codprov })
+                                    setSuggestions([]);
+                                    
+                                }}>
+                                    {articulo.descripcion} ({articulo.code})
+                                </li>
+                            ))}
+                        </ul>
+                    )}
                 </section>
                 <section className="row mb-3">
                     <label htmlFor="quantity" className="col-sm-4 col-form-label">Stock:</label>

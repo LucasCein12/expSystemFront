@@ -66,9 +66,10 @@ const Productos = () => {
     }
     const mapDataForExcel = (data) => {
         return data.map(item => ({
-            'Nombre': item.name,
             'Codigo': item.code,
-            'Fecha Vencimiento': formatToDDMMYYYY(item.date), // Assuming 'date' is already formatted as needed
+            'EAN': item.codbarras,
+            'Descripcion': item.name,
+            'Cod Proveedor': item.codprov,
             'Cantidad Unid.': item.quantityu,
             'Cantidad Bulto': item.quantityb
         }));
