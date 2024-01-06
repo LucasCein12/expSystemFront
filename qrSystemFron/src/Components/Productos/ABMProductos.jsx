@@ -118,7 +118,7 @@ const ABMProductos = ({ close, productid, productos, actualizarListaProductos })
     };
     const handleChangeBarras=(e)=>{
         const {name,value}=e.target
-        if (value) {
+        if (value && name=='codprov') {
             setSuggestions(articulos.filter((art) => art[name].toLowerCase().includes(value.toLowerCase())));
         } else {
             setSuggestions([]);
