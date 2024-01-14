@@ -139,6 +139,7 @@ const ABMProductos = ({ close, productid, productos, actualizarListaProductos })
         return nextProductId
 
     }
+    //abcde
     const handleKeyDown = (e) => {
         const currentActive = document.activeElement;
         switch (e.key) {
